@@ -11,16 +11,26 @@ import java.util.Objects;
 
 public abstract class DynamicTypeAdapter extends TypeAdapter<Object> {
 
+	private final ComparisonStrategy comparisonStrategy;
 	private final List<TypeToken<?>> types;
 
-	public DynamicTypeAdapter(TypeToken<?>... types) {
+	public DynamicTypeAdapter(ComparisonStrategy comparisonStrategy, TypeToken<?>... types) {
+		Objects.requireNonNull(comparisonStrategy, "comparisonStrategy");
+
+		this.comparisonStrategy = comparisonStrategy;
 		this.types = Arrays.stream(types)
 				.filter(Objects::nonNull)
 				.collect(Collectors2.toUnmodifiableList());
 	}
 
-	public final List<TypeToken<?>> getTypes() {
-		return types;
+	public final boolean matches(TypeToken<?> type) {
+		for (TypeToken<?> convertable : types) {
+			if (comparisonStrategy.test(convertable, type)) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 }

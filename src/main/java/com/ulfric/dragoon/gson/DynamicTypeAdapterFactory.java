@@ -25,14 +25,12 @@ public class DynamicTypeAdapterFactory implements TypeAdapterFactory {
 		typeAdapters.remove(typeAdapter);
 	}
 
-	@SuppressWarnings({"deprecation", "unchecked"})
+	@SuppressWarnings("unchecked")
 	@Override
 	public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> type) {
 		for (DynamicTypeAdapter typeAdapter : typeAdapters) {
-			for (TypeToken<?> typeAdapterType : typeAdapter.getTypes()) {
-				if (typeAdapterType.isAssignableFrom(type)) { // TODO deprecated
-					return (TypeAdapter<T>) typeAdapter;
-				}
+			if (typeAdapter.matches(type)) {
+				return (TypeAdapter<T>) typeAdapter;
 			}
 		}
 
